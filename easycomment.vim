@@ -1,8 +1,5 @@
-function! IsLineCommented(l)
-    if b:comment_style == "inline"
-        return getline(a:l) =~ '\v^\s*'.escape(b:comment_opener, "\/*")
-    endif
-    return 0
+function! s:IsLineCommented(l)
+    return getline(a:l) =~ '\v^\s*'.escape(b:comment_opener, "\/*")
 endfunction
 
 function! ToggleCommentVisual() range
@@ -10,11 +7,10 @@ function! ToggleCommentVisual() range
         let fl = getpos("'<")[1]
         let ll = getpos("'>")[1]
 
-        if getline(fl) =~ '\v^\s*'.escape(b:comment_opener, "\/*")
-            call Uncomment(fl, ll)
+        if s:IsLineCommented(fl)
+            call s:Uncomment(fl, ll)
         else
-            echo "commenting"
-            call Comment(fl, ll)
+            call s:Comment(fl, ll)
         endif
     endif
 endfunction
@@ -23,31 +19,31 @@ function! ToggleCommentLine()
     if exists("b:comment_style")
         let l = getpos(".")[1]
 
-        if getline(l) =~ '\v^\s*'.escape(b:comment_opener, "\/*")
-            call Uncomment(l, l)
+        if s:IsLineCommented(l)
+            call s:Uncomment(l, l)
         else
-            call Comment(l, l)
+            call s:Comment(l, l)
         endif
     endif
 endfunction
 
-function! Comment(fl, ll)
+function! s:Comment(fl, ll)
     if b:comment_style == "inline"
-        call InlineComment(a:fl, a:ll)
+        call s:InlineComment(a:fl, a:ll)
     elseif b:comment_style == "block"
-        call BlockComment(a:fl, a:ll)
+        call s:BlockComment(a:fl, a:ll)
     endif
 endfunction
 
-function! Uncomment(fl, ll)
+function! s:Uncomment(fl, ll)
     if b:comment_style == "inline"
-        call InlineUncomment(a:fl, a:ll)
+        call s:InlineUncomment(a:fl, a:ll)
     elseif b:comment_style == "block"
-        call BlockUncomment(a:fl, a:ll)
+        call s:BlockUncomment(a:fl, a:ll)
     endif
 endfunction
 
-function! BlockComment(fl, ll)
+function! s:BlockComment(fl, ll)
     call setline(a:fl, b:comment_opener.getline(a:fl))
     call setline(a:ll, getline(a:ll).b:comment_closer)
 
@@ -59,10 +55,10 @@ function! BlockComment(fl, ll)
     endwhile
 endfunction
 
-function! InlineComment(fl, ll)
+function! s:InlineComment(fl, ll)
     let i = a:fl
     while i <= a:ll
-        if !IsLineCommented(i)
+        if !s:IsLineCommented(i)
             let cl = getline(i)
             let cl2 = b:comment_opener.cl
             call setline(i, cl2)
@@ -71,7 +67,7 @@ function! InlineComment(fl, ll)
     endwhile
 endfunction
 
-function! BlockUncomment(fl, ll)
+function! s:BlockUncomment(fl, ll)
     let i = a:fl
     call setline(a:fl, substitute(getline(a:fl), '\v^(\s*)'.escape(b:comment_opener, "\/*"), '\1', ""))
     call setline(a:ll, substitute(getline(a:ll), '\v(\s*)'.escape(b:comment_closer, "\/*")."$", '\1', ""))
@@ -84,7 +80,7 @@ function! BlockUncomment(fl, ll)
     endwhile
 endfunction
 
-function! InlineUncomment(fl, ll)
+function! s:InlineUncomment(fl, ll)
     let i = a:fl
     while i <= a:ll
         let cl = getline(i)
@@ -94,3 +90,16 @@ function! InlineUncomment(fl, ll)
     endwhile
 endfunction
 
+" comment style definitions
+au FileType vim,javascript,python let b:comment_style="inline"
+au FileType html,css,c let b:comment_style="block"
+
+au FileType vim let b:comment_opener='"'
+au FileType javascript let b:comment_opener='//'
+au FileType python let b:comment_opener='#'
+
+au FileType c,css let b:comment_opener='/*'
+au FileType c,css let b:comment_closer='*/'
+
+au FileType html let b:comment_opener='<!--'
+au FileType html let b:comment_closer='-->'
