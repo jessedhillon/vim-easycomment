@@ -26,7 +26,7 @@ the same key, by adding the following lines to `.vimrc`
     nmap <silent> <C-_> :call ToggleCommentLine()<CR>
 
 The suggested mapping is <kbd>Ctrl + /</kbd> (due to historical reasons, 
-backslash is represented as underscore when mapping keys in Vim). The first
+forward slash is represented as underscore when mapping keys in Vim). The first
 mapping will invoke `ToggleCommentVisual()` on any visual selection, causing
 comment/uncommenting of the lines spanned by that selection. The second mapping
 can be invoked without any selection, and will comment/uncomment the current
