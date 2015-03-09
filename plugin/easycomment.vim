@@ -91,12 +91,12 @@ function! s:InlineUncomment(fl, ll)
 endfunction
 
 " comment style definitions
-au FileType vim,javascript,python let b:comment_style="inline"
+au FileType vim,javascript,python,ruby let b:comment_style="inline"
 au FileType html,css,c let b:comment_style="block"
 
 au FileType vim let b:comment_opener='"'
 au FileType javascript let b:comment_opener='//'
-au FileType python let b:comment_opener='#'
+au FileType python,ruby let b:comment_opener='#'
 
 au FileType c,css let b:comment_opener='/*'
 au FileType c,css let b:comment_closer='*/'
